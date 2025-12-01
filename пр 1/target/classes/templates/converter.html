@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конвертер валют</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a th:href="@{/calculator}" class="nav-link">Калькулятор</a>
+        <a th:href="@{/converter}" class="nav-link active">Конвертер валют</a>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h1 class="title">💱 Конвертер валют</h1>
+            
+            <form method="post" th:action="@{/converter}" class="form">
+                <div class="input-group">
+                    <label for="amount">Сумма в рублях (₽)</label>
+                    <input type="number" id="amount" name="amount" step="0.01" min="0"
+                           th:value="${amount}" required placeholder="Введите сумму">
+                </div>
+                
+                <div class="input-group">
+                    <label for="currency">Валюта для конвертации</label>
+                    <select id="currency" name="currency" required>
+                        <option th:each="entry : ${currencies}" 
+                                th:value="${entry.key}" 
+                                th:text="${entry.key + ' - ' + entry.value}"
+                                th:selected="${entry.key == selectedCurrency}">
+                        </option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn">Конвертировать</button>
+            </form>
+            
+            <div th:if="${result != null}" class="result success">
+                <div class="conversion-details">
+                    <span class="result-label">
+                        <span th:text="${#numbers.formatDecimal(amount, 1, 2)}"></span> ₽ = 
+                    </span>
+                    <span class="result-value" th:text="${#numbers.formatDecimal(result, 1, 2)}"></span>
+                    <span class="currency-code" th:text="${selectedCurrency}"></span>
+                </div>
+                <div class="rate-info">
+                    <small>Курс: 1 <span th:text="${selectedCurrency}"></span> = <span th:text="${rate}"></span> ₽</small>
+                </div>
+            </div>
+            
+            <div th:if="${error != null}" class="result error">
+                <span th:text="${error}"></span>
+            </div>
+            
+            <div class="rates-table">
+                <h3>Текущие курсы:</h3>
+                <table>
+                    <tr th:each="entry : ${currencies}">
+                        <td th:text="${entry.key}"></td>
+                        <td th:text="${entry.value}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

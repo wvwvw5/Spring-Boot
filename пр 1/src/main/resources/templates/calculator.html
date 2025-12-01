@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a th:href="@{/calculator}" class="nav-link active">Калькулятор</a>
+        <a th:href="@{/converter}" class="nav-link">Конвертер валют</a>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h1 class="title">🧮 Калькулятор</h1>
+            
+            <form method="post" th:action="@{/calculator}" class="form">
+                <div class="input-group">
+                    <label for="num1">Первое число</label>
+                    <input type="number" id="num1" name="num1" step="any" 
+                           th:value="${num1}" required placeholder="Введите число">
+                </div>
+                
+                <div class="input-group">
+                    <label for="operation">Операция</label>
+                    <select id="operation" name="operation" required>
+                        <option value="add" th:selected="${operation == 'add'}">➕ Сложение</option>
+                        <option value="subtract" th:selected="${operation == 'subtract'}">➖ Вычитание</option>
+                        <option value="multiply" th:selected="${operation == 'multiply'}">✖️ Умножение</option>
+                        <option value="divide" th:selected="${operation == 'divide'}">➗ Деление</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="num2">Второе число</label>
+                    <input type="number" id="num2" name="num2" step="any" 
+                           th:value="${num2}" required placeholder="Введите число">
+                </div>
+                
+                <button type="submit" class="btn">Вычислить</button>
+            </form>
+            
+            <div th:if="${result != null}" class="result success">
+                <span class="result-label">Результат:</span>
+                <span class="result-value" th:text="${#numbers.formatDecimal(result, 1, 4)}"></span>
+            </div>
+            
+            <div th:if="${error != null}" class="result error">
+                <span th:text="${error}"></span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
