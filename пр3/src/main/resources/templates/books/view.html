@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${book.title}">Книга</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link active">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">📖 <span th:text="${book.title}"></span></h1>
+            <div class="btn-group">
+                <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-primary">✏️ Редактировать</a>
+                <a th:href="@{/books}" class="btn btn-secondary">← Назад</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <table>
+                <tr><th style="width:200px;">ID</th><td th:text="${book.id}"></td></tr>
+                <tr><th>Название</th><td th:text="${book.title}"></td></tr>
+                <tr><th>ISBN</th><td th:text="${book.isbn ?: '-'}"></td></tr>
+                <tr><th>Автор</th><td th:text="${book.author != null ? book.author.fullName : '-'}"></td></tr>
+                <tr><th>Издательство</th><td th:text="${book.publisher != null ? book.publisher.name : '-'}"></td></tr>
+                <tr><th>Жанры</th>
+                    <td>
+                        <span th:each="g : ${book.genres}" class="badge badge-info" th:text="${g.name}" style="margin-right:4px;"></span>
+                        <span th:if="${book.genres.isEmpty()}">-</span>
+                    </td>
+                </tr>
+                <tr><th>Год издания</th><td th:text="${book.publicationYear ?: '-'}"></td></tr>
+                <tr><th>Страниц</th><td th:text="${book.pages ?: '-'}"></td></tr>
+                <tr><th>Цена</th><td th:text="${book.price != null ? book.price + ' ₽' : '-'}"></td></tr>
+                <tr><th>Копий</th><td th:text="${book.availableCopies + ' / ' + book.totalCopies}"></td></tr>
+                <tr><th>Активных выдач</th><td th:text="${activeLoans}"></td></tr>
+                <tr><th>Описание</th><td th:text="${book.description ?: '-'}"></td></tr>
+            </table>
+        </div>
+
+        <div class="btn-group">
+            <a th:href="@{/loans/new(bookId=${book.id})}" class="btn btn-success" th:if="${book.availableCopies > 0}">📋 Выдать книгу</a>
+            <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить книгу?')">🗑️ Удалить</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

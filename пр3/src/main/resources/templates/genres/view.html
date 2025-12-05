@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${genre.name}">Жанр</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link active">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">🏷️ <span th:text="${genre.name}"></span></h1>
+            <div class="btn-group">
+                <a th:href="@{/genres/{id}/edit(id=${genre.id})}" class="btn btn-primary">✏️ Редактировать</a>
+                <a th:href="@{/genres}" class="btn btn-secondary">← Назад</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <table>
+                <tr><th style="width:200px;">ID</th><td th:text="${genre.id}"></td></tr>
+                <tr><th>Название</th><td th:text="${genre.name}"></td></tr>
+                <tr><th>Описание</th><td th:text="${genre.description ?: '-'}"></td></tr>
+                <tr><th>Книг в жанре</th><td th:text="${booksCount}"></td></tr>
+            </table>
+        </div>
+
+        <div class="btn-group">
+            <a th:href="@{/books(genreId=${genre.id})}" class="btn btn-info">📖 Книги жанра</a>
+            <form th:action="@{/genres/{id}/delete(id=${genre.id})}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить жанр?')">🗑️ Удалить</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

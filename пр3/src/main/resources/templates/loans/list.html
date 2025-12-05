@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выдачи книг - Библиотека</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link active">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">📋 Выдачи книг</h1>
+            <div class="btn-group">
+                <a th:href="@{/loans/new}" class="btn btn-primary">+ Новая выдача</a>
+                <a th:href="@{/loans/overdue}" class="btn btn-warning">⚠️ Просроченные</a>
+            </div>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success">✅ <span th:text="${success}"></span></div>
+        <div th:if="${error}" class="alert alert-danger">❌ <span th:text="${error}"></span></div>
+
+        <div class="filters">
+            <form th:action="@{/loans}" method="get">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label>Читатель</label>
+                        <input type="text" name="search" th:value="${search}" placeholder="Имя читателя...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Книга</label>
+                        <select name="bookId">
+                            <option value="">Все</option>
+                            <option th:each="b : ${books}" th:value="${b.id}" th:text="${b.title}" th:selected="${b.id == bookId}"></option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Статус</label>
+                        <select name="status">
+                            <option value="">Все</option>
+                            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.displayName}" th:selected="${s == status}"></option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Сортировка</label>
+                        <select name="sortBy">
+                            <option value="loanDate" th:selected="${sortBy == 'loanDate'}">По дате выдачи</option>
+                            <option value="dueDate" th:selected="${sortBy == 'dueDate'}">По сроку возврата</option>
+                            <option value="readerName" th:selected="${sortBy == 'readerName'}">По читателю</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary btn-sm">🔍</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="bulk-actions" id="bulkActions">
+            <span>Выбрано: <strong id="selectedCount">0</strong></span>
+            <button type="button" class="btn btn-danger btn-sm" onclick="deleteSelected()">❌ Удалить</button>
+        </div>
+
+        <div class="table-container" th:if="${!loans.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell"><input type="checkbox" id="selectAll" onclick="toggleAll()"></th>
+                        <th>Книга</th>
+                        <th>Читатель</th>
+                        <th>Дата выдачи</th>
+                        <th>Срок возврата</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="loan : ${loans}">
+                        <td class="checkbox-cell"><input type="checkbox" class="item-checkbox" th:value="${loan.id}" onchange="updateBulkActions()"></td>
+                        <td th:text="${loan.book.title}"></td>
+                        <td th:text="${loan.readerName}"></td>
+                        <td th:text="${loan.loanDate}"></td>
+                        <td th:text="${loan.dueDate}"></td>
+                        <td>
+                            <span th:class="${loan.status.name() == 'ACTIVE' ? 'badge badge-info' : (loan.status.name() == 'RETURNED' ? 'badge badge-success' : 'badge badge-danger')}"
+                                  th:text="${loan.status.displayName}"></span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a th:href="@{/loans/{id}(id=${loan.id})}" class="btn btn-secondary btn-sm">👁️</a>
+                                <form th:if="${loan.status.name() == 'ACTIVE'}" th:action="@{/loans/{id}/return(id=${loan.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-success btn-sm">✅</button>
+                                </form>
+                                <form th:action="@{/loans/{id}/delete(id=${loan.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить запись?')">🗑️</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${loans.isEmpty()}" class="empty-state">
+            <h3>Выдачи не найдены</h3>
+            <a th:href="@{/loans/new}" class="btn btn-primary">+ Новая выдача</a>
+        </div>
+    </div>
+
+    <form id="deleteForm" th:action="@{/loans/delete-multiple}" method="post" style="display:none;">
+        <input type="hidden" name="ids" id="deleteIds">
+    </form>
+
+    <script>
+        function toggleAll() {
+            const selectAll = document.getElementById('selectAll');
+            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = selectAll.checked);
+            updateBulkActions();
+        }
+        function updateBulkActions() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            document.getElementById('selectedCount').textContent = checked.length;
+            document.getElementById('bulkActions').classList.toggle('show', checked.length > 0);
+        }
+        function deleteSelected() {
+            const ids = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
+            if (ids.length === 0) return;
+            if (!confirm('Удалить выбранные записи?')) return;
+            document.getElementById('deleteIds').value = ids.join(',');
+            document.getElementById('deleteForm').submit();
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${loan.id != null ? 'Редактирование выдачи' : 'Новая выдача'}">Выдача</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link active">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title" th:text="${loan.id != null ? '✏️ Редактирование выдачи' : '➕ Новая выдача'}"></h1>
+            <a th:href="@{/loans}" class="btn btn-secondary">← Назад</a>
+        </div>
+
+        <div class="card">
+            <form th:action="${loan.id != null ? '/loans/' + loan.id : '/loans'}" method="post" th:object="${loan}">
+                <div class="form-group" th:if="${loan.id == null}">
+                    <label class="form-label">Книга *</label>
+                    <select name="bookId" class="form-control" required>
+                        <option value="">-- Выберите книгу --</option>
+                        <option th:each="b : ${books}" th:value="${b.id}" 
+                                th:text="${b.title + ' (доступно: ' + b.availableCopies + ')'}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group" th:if="${loan.id != null}">
+                    <label class="form-label">Книга</label>
+                    <input type="text" th:value="${loan.book.title}" class="form-control" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Имя читателя *</label>
+                    <input type="text" th:field="*{readerName}" class="form-control" placeholder="ФИО читателя">
+                    <div th:if="${#fields.hasErrors('readerName')}" class="form-error" th:errors="*{readerName}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email читателя</label>
+                    <input type="email" th:field="*{readerEmail}" class="form-control" placeholder="reader@email.com">
+                    <div th:if="${#fields.hasErrors('readerEmail')}" class="form-error" th:errors="*{readerEmail}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Телефон читателя</label>
+                    <input type="text" th:field="*{readerPhone}" class="form-control" placeholder="+7 (999) 123-45-67">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Дата выдачи *</label>
+                    <input type="date" th:field="*{loanDate}" class="form-control" th:readonly="${loan.id != null}">
+                    <div th:if="${#fields.hasErrors('loanDate')}" class="form-error" th:errors="*{loanDate}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Срок возврата *</label>
+                    <input type="date" th:field="*{dueDate}" class="form-control">
+                    <div th:if="${#fields.hasErrors('dueDate')}" class="form-error" th:errors="*{dueDate}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Примечания</label>
+                    <textarea th:field="*{notes}" class="form-control" placeholder="Дополнительная информация"></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">💾 Сохранить</button>
+                    <a th:href="@{/loans}" class="btn btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

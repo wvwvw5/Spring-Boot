@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${publisher.id != null ? 'Редактирование издательства' : 'Новое издательство'}">Издательство</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link active">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title" th:text="${publisher.id != null ? '✏️ Редактирование издательства' : '➕ Новое издательство'}"></h1>
+            <a th:href="@{/publishers}" class="btn btn-secondary">← Назад</a>
+        </div>
+
+        <div class="card">
+            <form th:action="${publisher.id != null ? '/publishers/' + publisher.id : '/publishers'}" method="post" th:object="${publisher}">
+                <div class="form-group">
+                    <label class="form-label">Название *</label>
+                    <input type="text" th:field="*{name}" class="form-control" placeholder="Название издательства">
+                    <div th:if="${#fields.hasErrors('name')}" class="form-error" th:errors="*{name}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Адрес</label>
+                    <input type="text" th:field="*{address}" class="form-control" placeholder="Адрес">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Город</label>
+                    <input type="text" th:field="*{city}" class="form-control" placeholder="Москва">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Страна</label>
+                    <input type="text" th:field="*{country}" class="form-control" placeholder="Россия">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" th:field="*{email}" class="form-control" placeholder="info@publisher.ru">
+                    <div th:if="${#fields.hasErrors('email')}" class="form-error" th:errors="*{email}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Телефон</label>
+                    <input type="text" th:field="*{phone}" class="form-control" placeholder="+7 (999) 123-45-67">
+                    <div th:if="${#fields.hasErrors('phone')}" class="form-error" th:errors="*{phone}"></div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">💾 Сохранить</button>
+                    <a th:href="@{/publishers}" class="btn btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

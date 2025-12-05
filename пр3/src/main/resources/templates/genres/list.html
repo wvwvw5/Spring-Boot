@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Жанры - Библиотека</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link active">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">🏷️ Жанры</h1>
+            <a th:href="@{/genres/new}" class="btn btn-primary">+ Добавить жанр</a>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success">✅ <span th:text="${success}"></span></div>
+        <div th:if="${error}" class="alert alert-danger">❌ <span th:text="${error}"></span></div>
+
+        <div class="filters">
+            <form th:action="@{/genres}" method="get">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label>Поиск</label>
+                        <input type="text" name="search" th:value="${search}" placeholder="Название...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Сортировка</label>
+                        <select name="sortDir">
+                            <option value="asc" th:selected="${sortDir == 'asc'}">А-Я</option>
+                            <option value="desc" th:selected="${sortDir == 'desc'}">Я-А</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary btn-sm">🔍</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="bulk-actions" id="bulkActions">
+            <span>Выбрано: <strong id="selectedCount">0</strong></span>
+            <button type="button" class="btn btn-danger btn-sm" onclick="deleteSelected()">❌ Удалить</button>
+        </div>
+
+        <div class="table-container" th:if="${!genres.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell"><input type="checkbox" id="selectAll" onclick="toggleAll()"></th>
+                        <th>Название</th>
+                        <th>Описание</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="genre : ${genres}">
+                        <td class="checkbox-cell"><input type="checkbox" class="item-checkbox" th:value="${genre.id}" onchange="updateBulkActions()"></td>
+                        <td th:text="${genre.name}"></td>
+                        <td th:text="${genre.description != null && genre.description.length() > 50 ? genre.description.substring(0, 50) + '...' : (genre.description ?: '-')}"></td>
+                        <td>
+                            <div class="btn-group">
+                                <a th:href="@{/genres/{id}(id=${genre.id})}" class="btn btn-secondary btn-sm">👁️</a>
+                                <a th:href="@{/genres/{id}/edit(id=${genre.id})}" class="btn btn-primary btn-sm">✏️</a>
+                                <form th:action="@{/genres/{id}/delete(id=${genre.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить жанр?')">🗑️</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${genres.isEmpty()}" class="empty-state">
+            <h3>Жанры не найдены</h3>
+            <a th:href="@{/genres/new}" class="btn btn-primary">+ Добавить жанр</a>
+        </div>
+    </div>
+
+    <form id="deleteForm" th:action="@{/genres/delete-multiple}" method="post" style="display:none;">
+        <input type="hidden" name="ids" id="deleteIds">
+    </form>
+
+    <script>
+        function toggleAll() {
+            const selectAll = document.getElementById('selectAll');
+            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = selectAll.checked);
+            updateBulkActions();
+        }
+        function updateBulkActions() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            document.getElementById('selectedCount').textContent = checked.length;
+            document.getElementById('bulkActions').classList.toggle('show', checked.length > 0);
+        }
+        function deleteSelected() {
+            const ids = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
+            if (ids.length === 0) return;
+            if (!confirm('Удалить выбранные жанры?')) return;
+            document.getElementById('deleteIds').value = ids.join(',');
+            document.getElementById('deleteForm').submit();
+        }
+    </script>
+</body>
+</html>
+

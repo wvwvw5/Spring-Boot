@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${author.id != null ? 'Редактирование автора' : 'Новый автор'}">Автор</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link active">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title" th:text="${author.id != null ? '✏️ Редактирование автора' : '➕ Новый автор'}"></h1>
+            <a th:href="@{/authors}" class="btn btn-secondary">← Назад</a>
+        </div>
+
+        <div class="card">
+            <form th:action="${author.id != null ? '/authors/' + author.id : '/authors'}" method="post" th:object="${author}">
+                <div class="form-group">
+                    <label class="form-label">Имя *</label>
+                    <input type="text" th:field="*{firstName}" class="form-control" placeholder="Имя">
+                    <div th:if="${#fields.hasErrors('firstName')}" class="form-error" th:errors="*{firstName}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Фамилия *</label>
+                    <input type="text" th:field="*{lastName}" class="form-control" placeholder="Фамилия">
+                    <div th:if="${#fields.hasErrors('lastName')}" class="form-error" th:errors="*{lastName}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Дата рождения</label>
+                    <input type="date" th:field="*{birthDate}" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Страна</label>
+                    <input type="text" th:field="*{country}" class="form-control" placeholder="Россия">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Биография</label>
+                    <textarea th:field="*{biography}" class="form-control" placeholder="Биография автора"></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">💾 Сохранить</button>
+                    <a th:href="@{/authors}" class="btn btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

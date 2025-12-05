@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${genre.id != null ? 'Редактирование жанра' : 'Новый жанр'}">Жанр</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link active">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title" th:text="${genre.id != null ? '✏️ Редактирование жанра' : '➕ Новый жанр'}"></h1>
+            <a th:href="@{/genres}" class="btn btn-secondary">← Назад</a>
+        </div>
+
+        <div class="card">
+            <form th:action="${genre.id != null ? '/genres/' + genre.id : '/genres'}" method="post" th:object="${genre}">
+                <div class="form-group">
+                    <label class="form-label">Название *</label>
+                    <input type="text" th:field="*{name}" class="form-control" placeholder="Название жанра">
+                    <div th:if="${#fields.hasErrors('name')}" class="form-error" th:errors="*{name}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Описание</label>
+                    <textarea th:field="*{description}" class="form-control" placeholder="Описание жанра"></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">💾 Сохранить</button>
+                    <a th:href="@{/genres}" class="btn btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

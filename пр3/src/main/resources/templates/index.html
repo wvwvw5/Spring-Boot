@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Библиотека - Главная</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link active">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>📚 Система управления библиотекой</h1>
+            <p>Полнофункциональное веб-приложение с PostgreSQL и MVC архитектурой</p>
+            
+            <div class="btn-group" style="justify-content: center;">
+                <a th:href="@{/books}" class="btn btn-primary">📖 Книги</a>
+                <a th:href="@{/loans}" class="btn btn-success">📋 Выдачи</a>
+                <a th:href="@{/authors}" class="btn btn-info">✍️ Авторы</a>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📖</div>
+                <h3>Книги</h3>
+                <p>Управление каталогом книг</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">✍️</div>
+                <h3>Авторы</h3>
+                <p>Информация об авторах</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🏢</div>
+                <h3>Издательства</h3>
+                <p>Каталог издательств</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🏷️</div>
+                <h3>Жанры</h3>
+                <p>Классификация книг</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3>Выдачи</h3>
+                <p>Учёт выдачи книг</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🐘</div>
+                <h3>PostgreSQL</h3>
+                <p>Надёжная база данных</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

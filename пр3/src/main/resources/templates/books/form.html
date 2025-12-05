@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${book.id != null ? 'Редактирование книги' : 'Новая книга'}">Книга</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link active">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title" th:text="${book.id != null ? '✏️ Редактирование книги' : '➕ Новая книга'}"></h1>
+            <a th:href="@{/books}" class="btn btn-secondary">← Назад</a>
+        </div>
+
+        <div class="card">
+            <form th:action="${book.id != null ? '/books/' + book.id : '/books'}" method="post" th:object="${book}">
+                <div class="form-group">
+                    <label class="form-label">Название *</label>
+                    <input type="text" th:field="*{title}" class="form-control" placeholder="Название книги">
+                    <div th:if="${#fields.hasErrors('title')}" class="form-error" th:errors="*{title}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">ISBN</label>
+                    <input type="text" th:field="*{isbn}" class="form-control" placeholder="978-...">
+                    <div th:if="${#fields.hasErrors('isbn')}" class="form-error" th:errors="*{isbn}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Автор</label>
+                    <select name="authorId" class="form-control">
+                        <option value="">-- Выберите автора --</option>
+                        <option th:each="a : ${authors}" th:value="${a.id}" th:text="${a.fullName}"
+                                th:selected="${book.author != null && book.author.id == a.id}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Издательство</label>
+                    <select name="publisherId" class="form-control">
+                        <option value="">-- Выберите издательство --</option>
+                        <option th:each="p : ${publishers}" th:value="${p.id}" th:text="${p.name}"
+                                th:selected="${book.publisher != null && book.publisher.id == p.id}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Жанры</label>
+                    <select name="genreIds" class="form-control" multiple style="height: 120px;">
+                        <option th:each="g : ${genres}" th:value="${g.id}" th:text="${g.name}"
+                                th:selected="${book.genres != null && book.genres.contains(g)}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Год издания</label>
+                    <input type="number" th:field="*{publicationYear}" class="form-control" placeholder="2024">
+                    <div th:if="${#fields.hasErrors('publicationYear')}" class="form-error" th:errors="*{publicationYear}"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Количество страниц</label>
+                    <input type="number" th:field="*{pages}" class="form-control" placeholder="300">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Цена</label>
+                    <input type="number" th:field="*{price}" class="form-control" step="0.01" placeholder="500.00">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Всего копий</label>
+                    <input type="number" th:field="*{totalCopies}" class="form-control" min="1" placeholder="1">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Доступно копий</label>
+                    <input type="number" th:field="*{availableCopies}" class="form-control" min="0" placeholder="1">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Описание</label>
+                    <textarea th:field="*{description}" class="form-control" placeholder="Описание книги"></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">💾 Сохранить</button>
+                    <a th:href="@{/books}" class="btn btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

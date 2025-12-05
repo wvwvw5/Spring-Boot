@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просроченные выдачи - Библиотека</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link active">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">⚠️ Просроченные выдачи</h1>
+            <a th:href="@{/loans}" class="btn btn-secondary">← Все выдачи</a>
+        </div>
+
+        <div class="table-container" th:if="${!loans.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Книга</th>
+                        <th>Читатель</th>
+                        <th>Телефон</th>
+                        <th>Дата выдачи</th>
+                        <th>Срок возврата</th>
+                        <th>Просрочено дней</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="loan : ${loans}">
+                        <td th:text="${loan.book.title}"></td>
+                        <td th:text="${loan.readerName}"></td>
+                        <td th:text="${loan.readerPhone ?: '-'}"></td>
+                        <td th:text="${loan.loanDate}"></td>
+                        <td th:text="${loan.dueDate}"></td>
+                        <td>
+                            <span class="badge badge-danger" 
+                                  th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(loan.dueDate, T(java.time.LocalDate).now())}"></span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a th:href="@{/loans/{id}(id=${loan.id})}" class="btn btn-secondary btn-sm">👁️</a>
+                                <form th:action="@{/loans/{id}/return(id=${loan.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-success btn-sm">✅ Вернуть</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${loans.isEmpty()}" class="empty-state">
+            <h3>🎉 Просроченных выдач нет!</h3>
+            <p>Все книги возвращены вовремя</p>
+        </div>
+    </div>
+</body>
+</html>
+

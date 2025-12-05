@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Книги - Библиотека</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link active">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">📖 Книги</h1>
+            <a th:href="@{/books/new}" class="btn btn-primary">+ Добавить книгу</a>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success">✅ <span th:text="${success}"></span></div>
+        <div th:if="${error}" class="alert alert-danger">❌ <span th:text="${error}"></span></div>
+
+        <div class="filters">
+            <form th:action="@{/books}" method="get">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label>Название</label>
+                        <input type="text" name="search" th:value="${search}" placeholder="Поиск...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Автор</label>
+                        <select name="authorId">
+                            <option value="">Все</option>
+                            <option th:each="a : ${authors}" th:value="${a.id}" th:text="${a.fullName}" th:selected="${a.id == authorId}"></option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Издательство</label>
+                        <select name="publisherId">
+                            <option value="">Все</option>
+                            <option th:each="p : ${publishers}" th:value="${p.id}" th:text="${p.name}" th:selected="${p.id == publisherId}"></option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Жанр</label>
+                        <select name="genreId">
+                            <option value="">Все</option>
+                            <option th:each="g : ${genres}" th:value="${g.id}" th:text="${g.name}" th:selected="${g.id == genreId}"></option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Год от</label>
+                        <input type="number" name="yearFrom" th:value="${yearFrom}" placeholder="1900">
+                    </div>
+                    <div class="filter-group">
+                        <label>Год до</label>
+                        <input type="number" name="yearTo" th:value="${yearTo}" placeholder="2024">
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary btn-sm">🔍</button>
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <a th:href="@{/books}" class="btn btn-secondary btn-sm">Сброс</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="bulk-actions" id="bulkActions">
+            <span>Выбрано: <strong id="selectedCount">0</strong></span>
+            <button type="button" class="btn btn-danger btn-sm" onclick="deleteSelected()">❌ Удалить</button>
+        </div>
+
+        <div class="table-container" th:if="${!books.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell"><input type="checkbox" id="selectAll" onclick="toggleAll()"></th>
+                        <th>Название</th>
+                        <th>Автор</th>
+                        <th>Издательство</th>
+                        <th>Год</th>
+                        <th>Доступно</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="book : ${books}">
+                        <td class="checkbox-cell"><input type="checkbox" class="item-checkbox" th:value="${book.id}" onchange="updateBulkActions()"></td>
+                        <td th:text="${book.title}"></td>
+                        <td>
+                            <span th:if="${book.author}" th:text="${book.author.fullName}"></span>
+                            <span th:unless="${book.author}" class="badge badge-warning">-</span>
+                        </td>
+                        <td>
+                            <span th:if="${book.publisher}" th:text="${book.publisher.name}"></span>
+                            <span th:unless="${book.publisher}">-</span>
+                        </td>
+                        <td th:text="${book.publicationYear}"></td>
+                        <td>
+                            <span th:class="${book.availableCopies > 0 ? 'badge badge-success' : 'badge badge-danger'}" 
+                                  th:text="${book.availableCopies} + '/' + ${book.totalCopies}"></span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-secondary btn-sm">👁️</a>
+                                <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-primary btn-sm">✏️</a>
+                                <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить книгу?')">🗑️</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${books.isEmpty()}" class="empty-state">
+            <h3>Книги не найдены</h3>
+            <a th:href="@{/books/new}" class="btn btn-primary">+ Добавить книгу</a>
+        </div>
+    </div>
+
+    <form id="deleteForm" th:action="@{/books/delete-multiple}" method="post" style="display:none;">
+        <input type="hidden" name="ids" id="deleteIds">
+    </form>
+
+    <script>
+        function toggleAll() {
+            const selectAll = document.getElementById('selectAll');
+            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = selectAll.checked);
+            updateBulkActions();
+        }
+        function updateBulkActions() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            document.getElementById('selectedCount').textContent = checked.length;
+            document.getElementById('bulkActions').classList.toggle('show', checked.length > 0);
+        }
+        function deleteSelected() {
+            const ids = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
+            if (ids.length === 0) return;
+            if (!confirm('Удалить выбранные книги?')) return;
+            document.getElementById('deleteIds').value = ids.join(',');
+            document.getElementById('deleteForm').submit();
+        }
+    </script>
+</body>
+</html>
+

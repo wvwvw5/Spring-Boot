@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${author.fullName}">Автор</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📚 Библиотека</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/books}" class="nav-link">Книги</a></li>
+            <li><a th:href="@{/authors}" class="nav-link active">Авторы</a></li>
+            <li><a th:href="@{/publishers}" class="nav-link">Издательства</a></li>
+            <li><a th:href="@{/genres}" class="nav-link">Жанры</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">Выдачи</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">✍️ <span th:text="${author.fullName}"></span></h1>
+            <div class="btn-group">
+                <a th:href="@{/authors/{id}/edit(id=${author.id})}" class="btn btn-primary">✏️ Редактировать</a>
+                <a th:href="@{/authors}" class="btn btn-secondary">← Назад</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <table>
+                <tr><th style="width:200px;">ID</th><td th:text="${author.id}"></td></tr>
+                <tr><th>Имя</th><td th:text="${author.firstName}"></td></tr>
+                <tr><th>Фамилия</th><td th:text="${author.lastName}"></td></tr>
+                <tr><th>Дата рождения</th><td th:text="${author.birthDate ?: '-'}"></td></tr>
+                <tr><th>Страна</th><td th:text="${author.country ?: '-'}"></td></tr>
+                <tr><th>Книг в библиотеке</th><td th:text="${booksCount}"></td></tr>
+                <tr><th>Биография</th><td th:text="${author.biography ?: '-'}"></td></tr>
+            </table>
+        </div>
+
+        <div class="btn-group">
+            <a th:href="@{/books(authorId=${author.id})}" class="btn btn-info">📖 Книги автора</a>
+            <form th:action="@{/authors/{id}/delete(id=${author.id})}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить автора?')">🗑️ Удалить</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+
