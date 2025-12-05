@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Категории - CRUD App</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📦 CRUD App</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/products}" class="nav-link">Товары</a></li>
+            <li><a th:href="@{/categories}" class="nav-link active">Категории</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">📁 Категории</h1>
+            <div class="btn-group">
+                <a th:href="@{/categories/new}" class="btn btn-primary">+ Добавить категорию</a>
+                <a th:href="@{/categories/trash}" class="btn btn-secondary">🗑️ Корзина</a>
+            </div>
+        </div>
+
+        <!-- Сообщения -->
+        <div th:if="${success}" class="alert alert-success">
+            ✅ <span th:text="${success}"></span>
+        </div>
+
+        <!-- Фильтры -->
+        <div class="filters">
+            <form th:action="@{/categories}" method="get">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label>Поиск по названию</label>
+                        <input type="text" name="search" th:value="${search}" placeholder="Введите название...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Сортировка</label>
+                        <select name="sortBy">
+                            <option value="name" th:selected="${sortBy == 'name'}">По названию</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Направление</label>
+                        <select name="sortDir">
+                            <option value="asc" th:selected="${sortDir == 'asc'}">По возрастанию</option>
+                            <option value="desc" th:selected="${sortDir == 'desc'}">По убыванию</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">🔍 Применить</button>
+                    </div>
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <a th:href="@{/categories}" class="btn btn-secondary">Сбросить</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Действия с выбранными -->
+        <div class="bulk-actions" id="bulkActions">
+            <span>Выбрано: <strong id="selectedCount">0</strong></span>
+            <button type="button" class="btn btn-warning btn-sm" onclick="softDeleteSelected()">
+                🗑️ В корзину
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="hardDeleteSelected()">
+                ❌ Удалить навсегда
+            </button>
+        </div>
+
+        <!-- Таблица категорий -->
+        <div class="table-container" th:if="${!categories.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell">
+                            <input type="checkbox" id="selectAll" onclick="toggleAll()">
+                        </th>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Описание</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="category : ${categories}">
+                        <td class="checkbox-cell">
+                            <input type="checkbox" class="item-checkbox" th:value="${category.id}" onchange="updateBulkActions()">
+                        </td>
+                        <td th:text="${category.id}"></td>
+                        <td th:text="${category.name}"></td>
+                        <td th:text="${category.description ?: '-'}"></td>
+                        <td>
+                            <div class="btn-group">
+                                <a th:href="@{/categories/{id}(id=${category.id})}" class="btn btn-secondary btn-sm">👁️</a>
+                                <a th:href="@{/categories/{id}/edit(id=${category.id})}" class="btn btn-primary btn-sm">✏️</a>
+                                <form th:action="@{/categories/{id}/soft-delete(id=${category.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Переместить в корзину?')">🗑️</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Пустое состояние -->
+        <div th:if="${categories.isEmpty()}" class="empty-state">
+            <h3>Категории не найдены</h3>
+            <p>Добавьте первую категорию или измените параметры фильтрации</p>
+            <a th:href="@{/categories/new}" class="btn btn-primary">+ Добавить категорию</a>
+        </div>
+    </div>
+
+    <!-- Скрытые формы для множественных операций -->
+    <form id="softDeleteForm" th:action="@{/categories/soft-delete-multiple}" method="post" style="display:none;">
+        <input type="hidden" name="ids" id="softDeleteIds">
+    </form>
+    <form id="hardDeleteForm" th:action="@{/categories/hard-delete-multiple}" method="post" style="display:none;">
+        <input type="hidden" name="ids" id="hardDeleteIds">
+    </form>
+
+    <script>
+        function toggleAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateBulkActions();
+        }
+
+        function updateBulkActions() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            selectedCount.textContent = checked.length;
+            bulkActions.classList.toggle('show', checked.length > 0);
+        }
+
+        function getSelectedIds() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            return Array.from(checked).map(cb => cb.value);
+        }
+
+        function softDeleteSelected() {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return;
+            if (!confirm('Переместить выбранные категории в корзину?')) return;
+            
+            document.getElementById('softDeleteIds').value = ids.join(',');
+            document.getElementById('softDeleteForm').submit();
+        }
+
+        function hardDeleteSelected() {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return;
+            if (!confirm('ВНИМАНИЕ! Удалить выбранные категории НАВСЕГДА?')) return;
+            
+            document.getElementById('hardDeleteIds').value = ids.join(',');
+            document.getElementById('hardDeleteForm').submit();
+        }
+    </script>
+</body>
+</html>
+

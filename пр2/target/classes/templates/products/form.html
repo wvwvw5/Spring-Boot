@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.id != null ? 'Редактирование товара' : 'Новый товар'} + ' - CRUD App'">Товар - CRUD App</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📦 CRUD App</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/products}" class="nav-link active">Товары</a></li>
+            <li><a th:href="@{/categories}" class="nav-link">Категории</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title" th:text="${product.id != null ? '✏️ Редактирование товара' : '➕ Новый товар'}"></h1>
+            <a th:href="@{/products}" class="btn btn-secondary">← Назад к списку</a>
+        </div>
+
+        <div class="card">
+            <form th:action="${product.id != null ? '/products/' + product.id : '/products'}" 
+                  method="post" th:object="${product}">
+                
+                <div class="form-group">
+                    <label class="form-label" for="name">Название *</label>
+                    <input type="text" id="name" th:field="*{name}" class="form-control" 
+                           placeholder="Введите название товара">
+                    <div th:if="${#fields.hasErrors('name')}" class="form-error">
+                        <span th:errors="*{name}"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="description">Описание</label>
+                    <textarea id="description" th:field="*{description}" class="form-control" 
+                              placeholder="Введите описание товара"></textarea>
+                    <div th:if="${#fields.hasErrors('description')}" class="form-error">
+                        <span th:errors="*{description}"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="price">Цена (₽) *</label>
+                    <input type="number" id="price" th:field="*{price}" class="form-control" 
+                           step="0.01" min="0.01" placeholder="0.00">
+                    <div th:if="${#fields.hasErrors('price')}" class="form-error">
+                        <span th:errors="*{price}"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="quantity">Количество *</label>
+                    <input type="number" id="quantity" th:field="*{quantity}" class="form-control" 
+                           min="0" placeholder="0">
+                    <div th:if="${#fields.hasErrors('quantity')}" class="form-error">
+                        <span th:errors="*{quantity}"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="categoryId">Категория</label>
+                    <select id="categoryId" name="categoryId" class="form-control">
+                        <option value="">-- Без категории --</option>
+                        <option th:each="cat : ${categories}" 
+                                th:value="${cat.id}" 
+                                th:text="${cat.name}"
+                                th:selected="${product.category != null && product.category.id == cat.id}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">
+                        💾 <span th:text="${product.id != null ? 'Сохранить изменения' : 'Создать товар'}"></span>
+                    </button>
+                    <a th:href="@{/products}" class="btn btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

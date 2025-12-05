@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина товаров - CRUD App</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📦 CRUD App</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/products}" class="nav-link active">Товары</a></li>
+            <li><a th:href="@{/categories}" class="nav-link">Категории</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">🗑️ Корзина товаров</h1>
+            <a th:href="@{/products}" class="btn btn-secondary">← Назад к товарам</a>
+        </div>
+
+        <!-- Сообщения -->
+        <div th:if="${success}" class="alert alert-success">
+            ✅ <span th:text="${success}"></span>
+        </div>
+
+        <!-- Действия с выбранными -->
+        <div class="bulk-actions" id="bulkActions">
+            <span>Выбрано: <strong id="selectedCount">0</strong></span>
+            <button type="button" class="btn btn-success btn-sm" onclick="restoreSelected()">
+                ♻️ Восстановить
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="hardDeleteSelected()">
+                ❌ Удалить навсегда
+            </button>
+        </div>
+
+        <!-- Таблица удалённых товаров -->
+        <div class="table-container" th:if="${!products.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell">
+                            <input type="checkbox" id="selectAll" onclick="toggleAll()">
+                        </th>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Категория</th>
+                        <th>Цена</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="product : ${products}">
+                        <td class="checkbox-cell">
+                            <input type="checkbox" class="item-checkbox" th:value="${product.id}" onchange="updateBulkActions()">
+                        </td>
+                        <td th:text="${product.id}"></td>
+                        <td th:text="${product.name}"></td>
+                        <td>
+                            <span th:if="${product.category}" class="badge badge-primary" th:text="${product.category.name}"></span>
+                            <span th:unless="${product.category}" class="badge badge-warning">Без категории</span>
+                        </td>
+                        <td th:text="${#numbers.formatDecimal(product.price, 1, 2)} + ' ₽'"></td>
+                        <td>
+                            <div class="btn-group">
+                                <form th:action="@{/products/restore-multiple}" method="post" style="display:inline;">
+                                    <input type="hidden" name="ids" th:value="${product.id}">
+                                    <button type="submit" class="btn btn-success btn-sm">♻️ Восстановить</button>
+                                </form>
+                                <form th:action="@{/products/{id}/hard-delete(id=${product.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('УДАЛИТЬ НАВСЕГДА?')">❌</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Пустая корзина -->
+        <div th:if="${products.isEmpty()}" class="empty-state">
+            <h3>Корзина пуста</h3>
+            <p>Удалённые товары будут отображаться здесь</p>
+            <a th:href="@{/products}" class="btn btn-primary">← Вернуться к товарам</a>
+        </div>
+    </div>
+
+    <!-- Скрытые формы -->
+    <form id="restoreForm" th:action="@{/products/restore-multiple}" method="post" style="display:none;">
+        <input type="hidden" name="ids" id="restoreIds">
+    </form>
+    <form id="hardDeleteForm" th:action="@{/products/hard-delete-multiple}" method="post" style="display:none;">
+        <input type="hidden" name="ids" id="hardDeleteIds">
+    </form>
+
+    <script>
+        function toggleAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateBulkActions();
+        }
+
+        function updateBulkActions() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            selectedCount.textContent = checked.length;
+            bulkActions.classList.toggle('show', checked.length > 0);
+        }
+
+        function getSelectedIds() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            return Array.from(checked).map(cb => cb.value);
+        }
+
+        function restoreSelected() {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return;
+            
+            document.getElementById('restoreIds').value = ids.join(',');
+            document.getElementById('restoreForm').submit();
+        }
+
+        function hardDeleteSelected() {
+            const ids = getSelectedIds();
+            if (ids.length === 0) return;
+            if (!confirm('ВНИМАНИЕ! Удалить выбранные товары НАВСЕГДА?')) return;
+            
+            document.getElementById('hardDeleteIds').value = ids.join(',');
+            document.getElementById('hardDeleteForm').submit();
+        }
+    </script>
+</body>
+</html>
+

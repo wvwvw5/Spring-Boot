@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name} + ' - CRUD App'">Товар - CRUD App</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📦 CRUD App</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/products}" class="nav-link active">Товары</a></li>
+            <li><a th:href="@{/categories}" class="nav-link">Категории</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">📦 <span th:text="${product.name}"></span></h1>
+            <div class="btn-group">
+                <a th:href="@{/products/{id}/edit(id=${product.id})}" class="btn btn-primary">✏️ Редактировать</a>
+                <a th:href="@{/products}" class="btn btn-secondary">← Назад к списку</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <table>
+                <tr>
+                    <th style="width: 200px;">ID</th>
+                    <td th:text="${product.id}"></td>
+                </tr>
+                <tr>
+                    <th>Название</th>
+                    <td th:text="${product.name}"></td>
+                </tr>
+                <tr>
+                    <th>Описание</th>
+                    <td th:text="${product.description ?: 'Нет описания'}"></td>
+                </tr>
+                <tr>
+                    <th>Цена</th>
+                    <td th:text="${#numbers.formatDecimal(product.price, 1, 2)} + ' ₽'"></td>
+                </tr>
+                <tr>
+                    <th>Количество</th>
+                    <td th:text="${product.quantity} + ' шт.'"></td>
+                </tr>
+                <tr>
+                    <th>Категория</th>
+                    <td>
+                        <span th:if="${product.category}" class="badge badge-primary" th:text="${product.category.name}"></span>
+                        <span th:unless="${product.category}" class="badge badge-warning">Без категории</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="btn-group">
+            <form th:action="@{/products/{id}/soft-delete(id=${product.id})}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-warning" onclick="return confirm('Переместить в корзину?')">
+                    🗑️ В корзину
+                </button>
+            </form>
+            <form th:action="@{/products/{id}/hard-delete(id=${product.id})}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('УДАЛИТЬ НАВСЕГДА?')">
+                    ❌ Удалить навсегда
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

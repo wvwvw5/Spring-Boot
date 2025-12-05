@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Application - Главная</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📦 CRUD App</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link active">Главная</a></li>
+            <li><a th:href="@{/products}" class="nav-link">Товары</a></li>
+            <li><a th:href="@{/categories}" class="nav-link">Категории</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>MVC CRUD Application</h1>
+            <p>Веб-приложение для управления товарами и категориями с полным набором CRUD-операций</p>
+            
+            <div class="btn-group" style="justify-content: center;">
+                <a th:href="@{/products}" class="btn btn-primary">📦 Товары</a>
+                <a th:href="@{/categories}" class="btn btn-secondary">📁 Категории</a>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">✨</div>
+                <h3>CRUD операции</h3>
+                <p>Создание, чтение, обновление и удаление записей</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Фильтрация</h3>
+                <p>Поиск по названию, категории и диапазону цен</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Сортировка</h3>
+                <p>Сортировка по нескольким параметрам</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🗑️</div>
+                <h3>Корзина</h3>
+                <p>Логическое и физическое удаление с восстановлением</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">✅</div>
+                <h3>Валидация</h3>
+                <p>Проверка данных при помощи аннотаций</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🏗️</div>
+                <h3>MVC архитектура</h3>
+                <p>Model-View-Controller паттерн проектирования</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

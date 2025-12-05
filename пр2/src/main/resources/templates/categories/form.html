@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${category.id != null ? 'Редактирование категории' : 'Новая категория'} + ' - CRUD App'">Категория - CRUD App</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">📦 CRUD App</a>
+        <ul class="navbar-nav">
+            <li><a th:href="@{/}" class="nav-link">Главная</a></li>
+            <li><a th:href="@{/products}" class="nav-link">Товары</a></li>
+            <li><a th:href="@{/categories}" class="nav-link active">Категории</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title" th:text="${category.id != null ? '✏️ Редактирование категории' : '➕ Новая категория'}"></h1>
+            <a th:href="@{/categories}" class="btn btn-secondary">← Назад к списку</a>
+        </div>
+
+        <div class="card">
+            <form th:action="${category.id != null ? '/categories/' + category.id : '/categories'}" 
+                  method="post" th:object="${category}">
+                
+                <div class="form-group">
+                    <label class="form-label" for="name">Название *</label>
+                    <input type="text" id="name" th:field="*{name}" class="form-control" 
+                           placeholder="Введите название категории">
+                    <div th:if="${#fields.hasErrors('name')}" class="form-error">
+                        <span th:errors="*{name}"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="description">Описание</label>
+                    <textarea id="description" th:field="*{description}" class="form-control" 
+                              placeholder="Введите описание категории"></textarea>
+                    <div th:if="${#fields.hasErrors('description')}" class="form-error">
+                        <span th:errors="*{description}"></span>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">
+                        💾 <span th:text="${category.id != null ? 'Сохранить изменения' : 'Создать категорию'}"></span>
+                    </button>
+                    <a th:href="@{/categories}" class="btn btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+
