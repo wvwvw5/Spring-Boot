@@ -31,3 +31,4 @@ public interface PublisherRepository extends JpaRepository<Publisher, Long> {
     long countBooks(@Param("publisherId") Long publisherId);
 }
 
+

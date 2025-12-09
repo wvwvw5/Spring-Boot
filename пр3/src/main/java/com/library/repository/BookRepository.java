@@ -62,3 +62,4 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     long countActiveLoans(@Param("bookId") Long bookId);
 }
 
+

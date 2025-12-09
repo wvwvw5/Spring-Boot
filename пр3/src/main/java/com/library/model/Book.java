@@ -132,3 +132,4 @@ public class Book {
     public void setLoans(List<BookLoan> loans) { this.loans = loans; }
 }
 
+

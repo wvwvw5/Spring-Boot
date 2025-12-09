@@ -27,3 +27,4 @@ public interface GenreRepository extends JpaRepository<Genre, Long> {
     long countBooks(@Param("genreId") Long genreId);
 }
 
+
