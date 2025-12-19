@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр книги - Книжный Магазин</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 th:text="${book.title}">Название книги</h2>
+            <div>
+                <a th:href="@{/web/books/{id}/edit(id=${book.id})}" class="btn btn-warning">Редактировать</a>
+                <a th:href="@{/web/books}" class="btn btn-secondary">Назад к списку</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">ID:</dt>
+                    <dd class="col-sm-9" th:text="${book.id}"></dd>
+                    
+                    <dt class="col-sm-3">Название:</dt>
+                    <dd class="col-sm-9" th:text="${book.title}"></dd>
+                    
+                    <dt class="col-sm-3">ISBN:</dt>
+                    <dd class="col-sm-9" th:text="${book.isbn}"></dd>
+                    
+                    <dt class="col-sm-3">Цена:</dt>
+                    <dd class="col-sm-9" th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 2, 'POINT')} + ' ₽'"></dd>
+                    
+                    <dt class="col-sm-3">Страниц:</dt>
+                    <dd class="col-sm-9" th:text="${book.pages}"></dd>
+                    
+                    <dt class="col-sm-3">Год издания:</dt>
+                    <dd class="col-sm-9" th:text="${book.publicationYear}"></dd>
+                    
+                    <dt class="col-sm-3">Издательство:</dt>
+                    <dd class="col-sm-9" th:text="${book.publisher?.name}"></dd>
+                    
+                    <dt class="col-sm-3">Авторы:</dt>
+                    <dd class="col-sm-9">
+                        <span th:each="author, iterStat : ${book.authors}">
+                            <span th:text="${author.fullName}"></span>
+                            <span th:if="${!iterStat.last}">, </span>
+                        </span>
+                    </dd>
+                    
+                    <dt class="col-sm-3">Жанры:</dt>
+                    <dd class="col-sm-9">
+                        <span th:each="genre, iterStat : ${book.genres}">
+                            <span th:text="${genre.name}"></span>
+                            <span th:if="${!iterStat.last}">, </span>
+                        </span>
+                    </dd>
+                    
+                    <dt class="col-sm-3">Описание:</dt>
+                    <dd class="col-sm-9" th:text="${book.description ?: 'Нет описания'}"></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+

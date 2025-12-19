@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная - Книжный Магазин</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center min-vh-75">
+                <div class="col-lg-6">
+                    <h1 class="display-3 fw-bold text-white mb-4">Добро пожаловать в Книжный Магазин!</h1>
+                    <p class="lead text-white mb-4">Откройте для себя мир литературы. Тысячи книг на любой вкус ждут вас!</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a th:href="@{/web/books}" class="btn btn-light btn-lg">
+                            <i class="bi bi-book"></i> Каталог книг
+                        </a>
+                        <a th:href="@{/register}" class="btn btn-outline-light btn-lg" th:unless="${username}">
+                            <i class="bi bi-person-plus"></i> Регистрация
+                        </a>
+                        <a th:href="@{/web/orders/new}" class="btn btn-outline-light btn-lg" th:if="${username}">
+                            <i class="bi bi-cart-plus"></i> Создать заказ
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <div class="hero-image">
+                        <i class="bi bi-book-half display-1 text-white opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- О нас -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="display-5 fw-bold mb-4">О нашем магазине</h2>
+                    <p class="lead text-muted mb-4">
+                        Мы предлагаем широкий ассортимент книг различных жанров: от классической литературы до современных бестселлеров. 
+                        Наша цель - сделать чтение доступным и приятным для каждого.
+                    </p>
+                    <div class="row mt-5">
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-box">
+                                <i class="bi bi-book text-primary display-4 mb-3"></i>
+                                <h4>Более 10,000 книг</h4>
+                                <p class="text-muted">Огромный выбор литературы на любой вкус</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-box">
+                                <i class="bi bi-truck text-primary display-4 mb-3"></i>
+                                <h4>Быстрая доставка</h4>
+                                <p class="text-muted">Доставим ваш заказ в кратчайшие сроки</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-box">
+                                <i class="bi bi-shield-check text-primary display-4 mb-3"></i>
+                                <h4>Гарантия качества</h4>
+                                <p class="text-muted">Только оригинальные издания от проверенных издательств</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Популярные книги -->
+    <section class="py-5" th:if="${popularBooks != null and !popularBooks.isEmpty()}">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <h2 class="display-5 fw-bold mb-3">Популярные книги</h2>
+                    <p class="lead text-muted">Самые востребованные издания в нашем каталоге</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4" th:each="book : ${popularBooks}">
+                    <div class="card h-100 shadow-sm book-card">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title" th:text="${book.title}">Название книги</h5>
+                            <p class="text-muted small mb-2">
+                                <span th:if="${book.authors != null and !book.authors.isEmpty()}">
+                                    <span th:each="author, iterStat : ${book.authors}">
+                                        <span th:text="${author.fullName}"></span><span th:if="${!iterStat.last}">, </span>
+                                    </span>
+                                </span>
+                                <span th:if="${book.authors == null or book.authors.isEmpty()}">Автор не указан</span>
+                            </p>
+                            <p class="card-text flex-grow-1" th:if="${book.description != null and book.description.length() > 0}">
+                                <span th:text="${book.description.length() > 100 ? book.description.substring(0, 100) + '...' : book.description}">Описание книги</span>
+                            </p>
+                            <p class="card-text flex-grow-1 text-muted" th:if="${book.description == null or book.description.length() == 0}">
+                                Описание отсутствует
+                            </p>
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-primary" th:if="${book.genres != null and !book.genres.isEmpty()}">
+                                        <span th:each="genre, iterStat : ${book.genres}">
+                                            <span th:text="${genre.name}"></span><span th:if="${!iterStat.last}">, </span>
+                                        </span>
+                                    </span>
+                                    <span class="badge bg-secondary" th:if="${book.genres == null or book.genres.isEmpty()}">Жанр не указан</span>
+                                    <span class="fw-bold text-success" th:if="${book.price != null}" th:text="'₽' + ${#numbers.formatDecimal(book.price, 0, 'COMMA', 2, 'POINT')}">Цена</span>
+                                    <span class="fw-bold text-success" th:if="${book.price == null}">Цена не указана</span>
+                                </div>
+                                <a th:href="@{/web/books/{id}(id=${book.id})}" class="btn btn-primary w-100">
+                                    <i class="bi bi-eye"></i> Подробнее
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5">
+                <a th:href="@{/web/books}" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-arrow-right"></i> Смотреть весь каталог
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Преимущества -->
+    <section class="py-5 bg-primary text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="display-5 fw-bold mb-5">Почему выбирают нас?</h2>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="benefit-item">
+                                <i class="bi bi-star-fill display-6 mb-3"></i>
+                                <h4>Лучшие цены</h4>
+                                <p>Конкурентные цены на все издания</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="benefit-item">
+                                <i class="bi bi-people-fill display-6 mb-3"></i>
+                                <h4>Профессиональный сервис</h4>
+                                <p>Наша команда всегда готова помочь</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="benefit-item">
+                                <i class="bi bi-heart-fill display-6 mb-3"></i>
+                                <h4>Любовь к книгам</h4>
+                                <p>Мы сами любим читать и знаем, что вам нужно</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="benefit-item">
+                                <i class="bi bi-clock-fill display-6 mb-3"></i>
+                                <h4>Круглосуточный доступ</h4>
+                                <p>Заказывайте книги в любое время</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Панель управления (только для авторизованных) -->
+    <section class="py-5" th:if="${username}">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="display-5 fw-bold mb-4 text-center">Панель управления</h2>
+                    <div class="row g-4">
+                        <div class="col-md-4" th:if="${isAdmin || isManager || isUser}">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-book text-primary display-4 mb-3"></i>
+                                    <h5 class="card-title">📚 Книги</h5>
+                                    <p class="card-text">Управление каталогом книг</p>
+                                    <a th:href="@{/web/books}" class="btn btn-primary">Перейти</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4" th:if="${isManager || isAdmin}">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-box-seam text-primary display-4 mb-3"></i>
+                                    <h5 class="card-title">📦 Склад</h5>
+                                    <p class="card-text">Управление складскими остатками</p>
+                                    <a th:href="@{/web/warehouse}" class="btn btn-primary">Перейти</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4" th:if="${isManager || isAdmin || isUser}">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-cart text-primary display-4 mb-3"></i>
+                                    <h5 class="card-title">🛒 Заказы</h5>
+                                    <p class="card-text" th:text="${isAdmin || isManager} ? 'Управление заказами' : 'Мои заказы'">Заказы</p>
+                                    <a th:href="@{/web/orders}" class="btn btn-primary">Перейти</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Контакты -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="display-5 fw-bold mb-4">Свяжитесь с нами</h2>
+                    <p class="lead text-muted mb-4">
+                        Есть вопросы? Мы всегда рады помочь вам найти нужную книгу!
+                    </p>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <i class="bi bi-telephone-fill text-primary display-6 mb-3"></i>
+                            <h5>Телефон</h5>
+                            <p class="text-muted">+7 (999) 123-45-67</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="bi bi-envelope-fill text-primary display-6 mb-3"></i>
+                            <h5>Email</h5>
+                            <p class="text-muted">info@bookstore.ru</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="bi bi-geo-alt-fill text-primary display-6 mb-3"></i>
+                            <h5>Адрес</h5>
+                            <p class="text-muted">г. Москва, ул. Книжная, д. 1</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>📚 Книжный Магазин</h5>
+                    <p class="text-muted mb-0">Ваш надежный партнер в мире литературы</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2024 Книжный Магазин. Все права защищены.</p>
+                    <p class="text-muted small mb-0">
+                        <a th:href="@{/swagger-ui.html}" target="_blank" class="text-white-50">API Документация</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${book.id != null} ? 'Редактировать книгу' : 'Добавить книгу'">Добавить книгу</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <div class="container mt-4">
+        <h2 th:text="${book.id != null} ? 'Редактировать книгу' : 'Добавить книгу'">Добавить книгу</h2>
+        
+        <div th:if="${error}" class="alert alert-danger">
+            <span th:text="${error}"></span>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <form th:action="${book.id != null} ? @{/web/books/{id}(id=${book.id})} : @{/web/books}" 
+                      method="POST"
+                      th:object="${book}">
+                    <input type="hidden" th:field="*{id}" th:if="${book != null && book.id != null}">
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Название *</label>
+                        <input type="text" class="form-control" id="title" th:field="*{title}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="isbn" class="form-label">ISBN *</label>
+                        <input type="text" class="form-control" id="isbn" th:field="*{isbn}" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="price" class="form-label">Цена *</label>
+                            <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="pages" class="form-label">Страниц *</label>
+                            <input type="number" class="form-control" id="pages" th:field="*{pages}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="publicationYear" class="form-label">Год издания *</label>
+                            <input type="number" class="form-control" id="publicationYear" th:field="*{publicationYear}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="publisherId" class="form-label">Издательство *</label>
+                        <select class="form-select" id="publisherId" name="publisherId" required>
+                            <option value="">Выберите издательство</option>
+                            <option th:each="publisher : ${publishers}" 
+                                    th:value="${publisher.id}" 
+                                    th:text="${publisher.name}"
+                                    th:selected="${book != null && book.publisher != null && book.publisher.id == publisher.id}"></option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Авторы</label>
+                        <div th:each="author : ${authors}" class="form-check">
+                            <input type="checkbox" 
+                                   th:id="'author_' + ${author.id}"
+                                   th:value="${author.id}"
+                                   name="authorIds"
+                                   class="form-check-input"
+                                   th:checked="${book != null && book.authors != null && book.authors.contains(author)}">
+                            <label class="form-check-label" th:for="'author_' + ${author.id}" th:text="${author.fullName}"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Жанры</label>
+                        <div th:each="genre : ${genres}" class="form-check">
+                            <input type="checkbox" 
+                                   th:id="'genre_' + ${genre.id}"
+                                   th:value="${genre.id}"
+                                   name="genreIds"
+                                   class="form-check-input"
+                                   th:checked="${book != null && book.genres != null && book.genres.contains(genre)}">
+                            <label class="form-check-label" th:for="'genre_' + ${genre.id}" th:text="${genre.name}"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание</label>
+                        <textarea class="form-control" id="description" th:field="*{description}" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                        <a th:href="@{/web/books}" class="btn btn-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
